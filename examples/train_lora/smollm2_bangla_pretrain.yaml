@@ -1,0 +1,45 @@
+### model
+model_name_or_path: HuggingFaceTB/SmolLM2-135M
+trust_remote_code: true
+
+### method
+stage: pt
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+### dataset
+dataset: titulm_bangla_corpus
+cutoff_len: 4096
+max_samples: 20000
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_num_workers: 4
+
+### output
+output_dir: saves/smollm2-135m/lora/bangla_pretrain
+logging_steps: 50
+save_steps: 1000
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: wandb  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### train
+per_device_train_batch_size: 8
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+num_train_epochs: 2
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+# eval_dataset: c4_demo
+# val_size: 0.0001  # Small eval sample like in your original script
+# per_device_eval_batch_size: 8
+# eval_strategy: steps
+# eval_steps: 1000

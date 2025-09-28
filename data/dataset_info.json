@@ -748,5 +748,32 @@
       "prompt": "content"
     },
     "folder": "python"
+  },
+  "titulm_bangla_corpus": {
+    "hf_hub_url": "hishab/titulm-bangla-corpus",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "titulm_bangla_common_crawl": {
+    "hf_hub_url": "hishab/titulm-bangla-corpus",
+    "columns": {
+      "prompt": "text"
+    },
+    "folder": "common_crawl"
+  },
+  "titulm_bangla_translated": {
+    "hf_hub_url": "hishab/titulm-bangla-corpus",
+    "columns": {
+      "prompt": "text"
+    },
+    "folder": "translated"
+  },
+  "titulm_bangla_romanized": {
+    "hf_hub_url": "hishab/titulm-bangla-corpus",
+    "columns": {
+      "prompt": "text"
+    },
+    "folder": "romanized"
   }
 }
