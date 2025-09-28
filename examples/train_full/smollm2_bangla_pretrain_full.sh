@@ -38,10 +38,10 @@ else
     conda activate ${CONDA_ENV_NAME}
 fi
 
-echo "[2/4] Merging tokenizer (TituLM -> SmolLM2)"
+echo "[2/4] Merging tokenizer (TituLM 48K Bangla tokens -> SmolLM2)"
 python - <<'PYCODE'
 import os
-from tokenizer_merger import create_merged_tokenizer_config
+from tokenizer_merger import create_targeted_merged_tokenizer, create_simple_merged_tokenizer, create_merged_tokenizer_config
 
 output_dir = os.environ.get("OUTPUT_DIR", "./saves/smollm2-135m/full/bangla_pretrain")
 merge_dir = os.path.join(output_dir, "merged_tokenizer")
@@ -49,12 +49,30 @@ merge_dir = os.path.join(output_dir, "merged_tokenizer")
 titulm = os.environ.get("TITULM_TOKENIZER", "hishab/titulm-llama-3.2-3b-v2.0")
 model = os.environ.get("MODEL_NAME", "HuggingFaceTB/SmolLM2-135M")
 
-tok = create_merged_tokenizer_config(
-    titulm_tokenizer_path=titulm,
-    smollm_tokenizer_path=model,
-    output_path=merge_dir,
-)
-print("Merged tokenizer vocab size:", len(tok))
+print("TituLM contains: LLaMA-32K + 48K new Bangla tokens = ~170K total")
+print("SmolLM2 contains: English tokens = 49K total")
+print("Target: Extract the 48K unique Bangla tokens from TituLM")
+
+try:
+    print("\nAttempting targeted tokenizer merging (48K Bangla tokens)...")
+    tok = create_targeted_merged_tokenizer(
+        titulm_tokenizer_path=titulm,
+        smollm_tokenizer_path=model,
+        output_path=merge_dir,
+        target_bangla_tokens=48000
+    )
+    print("Targeted merged tokenizer vocab size:", len(tok))
+    
+    if len(tok) <= 50000:  # If very few tokens were added
+        print("Few tokens added, trying simple approach...")
+        tok = create_simple_merged_tokenizer(titulm, model, merge_dir)
+        print("Simple merged tokenizer vocab size:", len(tok))
+        
+except Exception as e:
+    print(f"Targeted merging failed: {e}")
+    print("Falling back to simple tokenizer merging...")
+    tok = create_simple_merged_tokenizer(titulm, model, merge_dir)
+    print("Simple merged tokenizer vocab size:", len(tok))
 PYCODE
 
 echo "[3/4] Starting pre-training with LLaMA-Factory (Full Fine-tuning)"
@@ -67,19 +85,19 @@ export WANDB_RUN_NAME="smollm2_bangla_full_$(date +%Y%m%d_%H%M%S)"
 
 # Run training with LLaMA-Factory
 nohup llamafactory-cli train examples/train_full/smollm2_bangla_pretrain_full.yaml \
-    --output_dir "${OUTPUT_DIR}" \
-    --model_name_or_path "${MODEL_NAME}" \
-    --dataset "${DATASET_NAME}" \
-    --max_samples 20000 \
-    --per_device_train_batch_size 4 \
-    --gradient_accumulation_steps 8 \
-    --learning_rate 2e-4 \
-    --num_train_epochs 2 \
-    --cutoff_len 4096 \
-    --bf16 true \
-    --logging_steps 50 \
-    --save_steps 1000 \
-    --report_to wandb \
+    output_dir="${OUTPUT_DIR}" \
+    model_name_or_path="${MODEL_NAME}" \
+    dataset="${DATASET_NAME}" \
+    max_samples=20000 \
+    per_device_train_batch_size=4 \
+    gradient_accumulation_steps=8 \
+    learning_rate=2e-4 \
+    num_train_epochs=2 \
+    cutoff_len=4096 \
+    bf16=true \
+    logging_steps=50 \
+    save_steps=1000 \
+    report_to=wandb \
     > "$NOHUP_LOG" 2>&1 &
 
 PID=$!

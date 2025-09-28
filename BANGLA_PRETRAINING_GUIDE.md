@@ -189,25 +189,54 @@ create_merged_tokenizer_config(
 | **Checkpointing** | Custom implementation | Built-in checkpointing |
 | **Evaluation** | Manual setup | Built-in evaluation |
 
+## Testing Your Setup
+
+Before running the full training, test your setup:
+
+```bash
+# Run the test script
+python test_bangla_pretraining.py
+```
+
+This will verify:
+- ✅ Environment setup (PyTorch, CUDA, LLaMA-Factory)
+- ✅ Configuration files
+- ✅ Dataset loading
+- ✅ Tokenizer merging
+
 ## Troubleshooting
 
-### 1. Memory Issues
+### 1. Command Line Argument Errors
+If you see errors like:
+```
+ValueError: Some keys are not used by the HfArgumentParser: ['--bf16', '--cutoff_len', ...]
+```
+
+**Solution**: The scripts have been fixed to use the correct argument format (`key=value` instead of `--key value`).
+
+### 2. Tokenizer Merging Issues
+If tokenizer merging shows "0 Bangla-specific tokens":
+
+**Solution**: The improved tokenizer merger now uses a **targeted approach**:
+- **TituLM contains**: LLaMA-32K + 48K new Bangla tokens = ~170K total
+- **SmolLM2 contains**: English tokens = 49K total  
+- **Target**: Extract the 48K unique Bangla tokens from TituLM
+- Uses scoring system to identify the most likely Bangla tokens
+- Falls back to simple merging if targeted approach fails
+- Includes comprehensive Bangla character detection
+
+### 3. Memory Issues
 - Reduce `per_device_train_batch_size`
 - Increase `gradient_accumulation_steps`
 - Use LoRA instead of full fine-tuning
 - Reduce `cutoff_len`
 
-### 2. Tokenizer Issues
-- Check if tokenizer merging completed successfully
-- Verify merged tokenizer is saved correctly
-- Use `create_simple_merged_tokenizer` as fallback
-
-### 3. Dataset Loading Issues
+### 4. Dataset Loading Issues
 - Verify dataset is accessible on HuggingFace Hub
 - Check dataset_info.json configuration
 - Test with smaller `max_samples` first
 
-### 4. GPU Issues
+### 5. GPU Issues
 - Check `CUDA_VISIBLE_DEVICES` setting
 - Verify GPU memory availability
 - Use `nvidia-smi` to monitor GPU usage
