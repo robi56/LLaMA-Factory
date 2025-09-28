@@ -72,6 +72,26 @@ NOHUP_LOG="${OUTPUT_DIR}/logs/train_$(date +%Y%m%d_%H%M%S).log"
 export WANDB_PROJECT="smollm2-bangla-pretraining"
 export WANDB_RUN_NAME="smollm2_bangla_lora_$(date +%Y%m%d_%H%M%S)"
 
+# Check if wandb key is set, prompt if not
+if [ -z "${WANDB_API_KEY:-}" ]; then
+    echo "⚠️  WANDB_API_KEY not set. You can:"
+    echo "   1. Export it: export WANDB_API_KEY=your_key_here"
+    echo "   2. Login interactively: wandb login"
+    echo "   3. Continue without wandb (will use 'none' instead)"
+    echo ""
+    read -p "Do you want to login to wandb now? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        wandb login
+    else
+        echo "Continuing without wandb logging..."
+        WANDB_REPORT_TO="none"
+    fi
+else
+    echo "✅ WANDB_API_KEY is set"
+    WANDB_REPORT_TO="wandb"
+fi
+
 # Run training with LLaMA-Factory
 nohup llamafactory-cli train examples/train_lora/smollm2_bangla_pretrain.yaml \
     output_dir="${OUTPUT_DIR}" \
@@ -86,7 +106,7 @@ nohup llamafactory-cli train examples/train_lora/smollm2_bangla_pretrain.yaml \
     bf16=true \
     logging_steps=50 \
     save_steps=1000 \
-    report_to=wandb \
+    report_to="${WANDB_REPORT_TO:-wandb}" \
     > "$NOHUP_LOG" 2>&1 &
 
 PID=$!
