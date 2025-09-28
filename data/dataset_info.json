@@ -775,5 +775,11 @@
       "prompt": "text"
     },
     "folder": "romanized"
+  },
+  "small_bangla_demo": {
+    "file_name": "small_bangla_demo.jsonl",
+    "columns": {
+      "prompt": "text"
+    }
   }
 }

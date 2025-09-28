@@ -1,0 +1,46 @@
+### model
+model_name_or_path: HuggingFaceTB/SmolLM2-135M
+trust_remote_code: true
+
+### method
+stage: pt
+do_train: true
+finetuning_type: lora
+lora_rank: 4
+lora_target: all
+
+### dataset
+dataset: small_bangla_demo
+cutoff_len: 512
+max_samples: 50
+overwrite_cache: true
+preprocessing_num_workers: 1
+dataloader_num_workers: 1
+
+### output
+output_dir: saves/smollm2-135m/lora/bangla_small_test
+logging_steps: 1
+save_steps: 10
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+report_to: none
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-4
+num_train_epochs: 1
+lr_scheduler_type: linear
+warmup_ratio: 0.1
+bf16: false
+fp16: false
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+# eval_dataset: small_bangla_demo
+# val_size: 0.1
+# per_device_eval_batch_size: 1
+# eval_strategy: steps
+# eval_steps: 10
