@@ -12,8 +12,8 @@ MODEL_NAME=${MODEL_NAME:-HuggingFaceTB/SmolLM2-135M}
 TITULM_TOKENIZER=${TITULM_TOKENIZER:-hishab/titulm-llama-3.2-3b-v2.0}
 DATASET_NAME=${DATASET_NAME:-titulm_bangla_corpus}
 
-# Use specific GPUs (adjust as needed)
-export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0,1,2,3}
+# Use all available GPUs (comment out to use specific GPUs)
+# export CUDA_VISIBLE_DEVICES=0,1,2,3  # Uncomment and modify to use specific GPUs
 
 echo "[1/4] Setting up environment: ${CONDA_ENV_NAME}"
 

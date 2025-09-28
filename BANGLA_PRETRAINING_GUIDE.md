@@ -93,14 +93,25 @@ dataset: titulm_bangla_romanized
 
 ### Multi-GPU Training
 
-Set the `CUDA_VISIBLE_DEVICES` environment variable:
+By default, the scripts use **all available GPUs**. To use specific GPUs, modify the scripts:
 
 ```bash
-# Use GPUs 0,1,2,3
+# Use all available GPUs (default)
+bash examples/train_lora/smollm2_bangla_pretrain.sh
+
+# Use specific GPUs (modify the script)
+# Uncomment and modify this line in the script:
+# export CUDA_VISIBLE_DEVICES=0,1,2,3
+```
+
+Or set the environment variable before running:
+
+```bash
+# Use specific GPUs
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 bash examples/train_lora/smollm2_bangla_pretrain.sh
 
-# Use specific GPUs
+# Use different GPUs
 export CUDA_VISIBLE_DEVICES=1,2,3,4
 bash examples/train_lora/smollm2_bangla_pretrain.sh
 ```
