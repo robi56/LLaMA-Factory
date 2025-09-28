@@ -34,6 +34,7 @@ def create_small_bangla_dataset():
                 f.write('\n')
         
         print(f"✅ Small Bangla dataset saved to: {output_file}")
+        print(f"✅ Dataset contains {len(small_samples)} samples")
         return output_file
         
     except Exception as e:
