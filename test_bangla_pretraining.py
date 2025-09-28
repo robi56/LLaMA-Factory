@@ -17,7 +17,9 @@ def test_tokenizer_merging():
     print("Testing tokenizer merging...")
     
     try:
-        from tokenizer_merger import create_targeted_merged_tokenizer, create_simple_merged_tokenizer, create_merged_tokenizer_config
+        import sys
+        sys.path.append('pre_training')
+        from tokenizer_merger import create_merged_tokenizer_config
         
         # Test parameters
         titulm_path = "hishab/titulm-llama-3.2-3b-v2.0"
@@ -31,27 +33,14 @@ def test_tokenizer_merging():
         print("SmolLM2 contains: English tokens = 49K total")
         print("Target: Extract the 48K unique Bangla tokens from TituLM")
         
-        # Try targeted merging first (most appropriate for your use case)
-        try:
-            print("\nAttempting targeted tokenizer merging (48K Bangla tokens)...")
-            tokenizer = create_targeted_merged_tokenizer(
-                titulm_tokenizer_path=titulm_path,
-                smollm_tokenizer_path=smollm_path,
-                output_path=output_path,
-                target_bangla_tokens=48000
-            )
-            print(f"✅ Targeted merging successful! Vocab size: {len(tokenizer)}")
-            
-            if len(tokenizer) <= 50000:
-                print("⚠️  Few tokens added, trying simple approach...")
-                tokenizer = create_simple_merged_tokenizer(titulm_path, smollm_path, output_path)
-                print(f"✅ Simple merging successful! Vocab size: {len(tokenizer)}")
-                
-        except Exception as e:
-            print(f"❌ Targeted merging failed: {e}")
-            print("Trying simple merging...")
-            tokenizer = create_simple_merged_tokenizer(titulm_path, smollm_path, output_path)
-            print(f"✅ Simple merging successful! Vocab size: {len(tokenizer)}")
+        # Use your existing tokenizer merger
+        print("\nMerging tokenizers using your existing approach...")
+        tokenizer = create_merged_tokenizer_config(
+            titulm_tokenizer_path=titulm_path,
+            smollm_tokenizer_path=smollm_path,
+            output_path=output_path
+        )
+        print(f"✅ Tokenizer merging successful! Vocab size: {len(tokenizer)}")
         
         # Clean up test directory
         import shutil
