@@ -17,11 +17,12 @@ dataloader_num_workers: 1
 
 ### output
 output_dir: saves/smollm2-135m/full/bangla_test
-logging_steps: 1
-save_steps: 5
+logging_steps: 5
+save_steps: 20
 plot_loss: true
 overwrite_output_dir: true
-save_only_model: false
+save_only_model: true
+save_total_limit: 2
 report_to: none
 
 ### train
