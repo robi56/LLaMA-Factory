@@ -102,7 +102,7 @@ nohup llamafactory-cli train examples/train_full/smollm2_bangla_pretrain_full.ya
     model_name_or_path="${MODEL_NAME}" \
     dataset="${DATASET_NAME}" \
     cache_dir="${HF_CACHE_DIR}" \
-    max_samples=20000 \
+    max_samples=1000000 \
     per_device_train_batch_size=4 \
     gradient_accumulation_steps=8 \
     learning_rate=2e-4 \
