@@ -13,12 +13,12 @@ TITULM_TOKENIZER=${TITULM_TOKENIZER:-hishab/titulm-llama-3.2-3b-v2.0}
 DATASET_NAME=${DATASET_NAME:-titulm_bangla_corpus}
 HF_CACHE_DIR=${HF_CACHE_DIR:-/raid/turn-detection/hf_cache}
 
-# Use all available GPUs (comment out to use specific GPUs)
-# export CUDA_VISIBLE_DEVICES=0,1,2,3  # Uncomment and modify to use specific GPUs
+# Use specific GPUs (1 to 7)
+export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7
 
 # Set custom Hugging Face cache directory
 export HF_HOME="${HF_CACHE_DIR}"
-
+export WANDB_API_KEY="d5b3c750c70f5b1c8d317165a8c50a808101648e"
 echo "[1/4] Setting up environment: ${CONDA_ENV_NAME}"
 
 # Initialize conda if not already done
