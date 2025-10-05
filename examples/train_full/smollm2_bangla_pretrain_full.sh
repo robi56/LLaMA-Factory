@@ -11,9 +11,13 @@ OUTPUT_DIR=${OUTPUT_DIR:-./saves/smollm2-135m/full/bangla_pretrain}
 MODEL_NAME=${MODEL_NAME:-HuggingFaceTB/SmolLM2-135M}
 TITULM_TOKENIZER=${TITULM_TOKENIZER:-hishab/titulm-llama-3.2-3b-v2.0}
 DATASET_NAME=${DATASET_NAME:-titulm_bangla_corpus}
+HF_CACHE_DIR=${HF_CACHE_DIR:-/raid/turn-detection/hf_cache}
 
 # Use all available GPUs (comment out to use specific GPUs)
 # export CUDA_VISIBLE_DEVICES=0,1,2,3  # Uncomment and modify to use specific GPUs
+
+# Set custom Hugging Face cache directory
+export HF_HOME="${HF_CACHE_DIR}"
 
 echo "[1/4] Setting up environment: ${CONDA_ENV_NAME}"
 
@@ -97,6 +101,7 @@ nohup llamafactory-cli train examples/train_full/smollm2_bangla_pretrain_full.ya
     output_dir="${OUTPUT_DIR}" \
     model_name_or_path="${MODEL_NAME}" \
     dataset="${DATASET_NAME}" \
+    cache_dir="${HF_CACHE_DIR}" \
     max_samples=20000 \
     per_device_train_batch_size=4 \
     gradient_accumulation_steps=8 \
