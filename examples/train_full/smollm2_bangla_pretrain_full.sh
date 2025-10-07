@@ -52,20 +52,26 @@ from tokenizer_merger import create_merged_tokenizer_config
 output_dir = os.environ.get("OUTPUT_DIR", "./saves/smollm2-135m/full/bangla_pretrain")
 merge_dir = os.path.join(output_dir, "merged_tokenizer")
 
-titulm = os.environ.get("TITULM_TOKENIZER", "hishab/titulm-llama-3.2-3b-v2.0")
+# Use the specified TituLM tokenizer path from the previous successful run
+titulm = os.environ.get("TITULM_TOKENIZER", "hishab/titulm-llama-3.2-1b-v2.0")
 model = os.environ.get("MODEL_NAME", "HuggingFaceTB/SmolLM2-135M")
 
 print("TituLM contains: LLaMA-32K + 48K new Bangla tokens = ~170K total")
 print("SmolLM2 contains: English tokens = 49K total")
-print("Target: Extract the 48K unique Bangla tokens from TituLM")
+print("Strategy: Use TituLM as base (170K) + add tokens from SmolLM2")
 
-print("\nMerging tokenizers...")
-tok = create_merged_tokenizer_config(
-    titulm_tokenizer_path=titulm,
-    smollm_tokenizer_path=model,
-    output_path=merge_dir
-)
-print("Merged tokenizer vocab size:", len(tok))
+# Create the merged tokenizer using the function from the saved file
+try:
+    merged_tokenizer = create_merged_tokenizer_config(
+        titulm_tokenizer_path=titulm,
+        smollm_tokenizer_path=model,
+        output_path=merge_dir,
+    )
+    print("Merged tokenizer created and saved successfully.")
+    print(f"Merged tokenizer vocab size: {len(merged_tokenizer)}")
+except Exception as e:
+    print(f"Error creating merged tokenizer: {e}")
+    merged_tokenizer = None # Ensure merged_tokenizer is None if creation fails
 PYCODE
 
 echo "[3/4] Starting pre-training with LLaMA-Factory (Full Fine-tuning)"
@@ -107,7 +113,11 @@ nohup llamafactory-cli train examples/train_full/smollm2_bangla_pretrain_full.ya
     gradient_accumulation_steps=8 \
     learning_rate=2e-4 \
     num_train_epochs=2 \
-    cutoff_len=4096 \
+    cutoff_len=8192 \
+    max_samples_per_dataset=100000 \
+    preprocessing_num_workers=16 \
+    packing=true \
+    neat_packing=true \
     bf16=true \
     logging_steps=50 \
     save_steps=1000 \
