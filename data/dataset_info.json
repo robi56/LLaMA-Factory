@@ -781,5 +781,31 @@
     "columns": {
       "prompt": "text"
     }
+  },
+  "turn_detector_demo": {
+    "file_name": "turn_detector_demo.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "rnnandi/bn-turn-detection-dataset-train-v3": {
+    "hf_hub_url": "rnnandi/bn-turn-detection-dataset-train-v3",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
   }
 }
