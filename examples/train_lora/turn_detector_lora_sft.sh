@@ -11,9 +11,9 @@ export HF_HOME="${HF_HOME:-./hf_cache}"
 export WANDB_API_KEY="${WANDB_API_KEY:-your_wandb_key_here}"
 
 # Training parameters
-OUTPUT_DIR="./saves/turn-detector/lora/sft"
-MODEL_NAME="hishab/titulm-llama-3.2-1b-v1.1"
-DATASET_NAME="turn_detector_demo"
+OUTPUT_DIR="./saves/turn-detector/lora/sft-qwen2_5-1_5b-refined50k"
+MODEL_NAME="Qwen/Qwen2.5-1.5B"
+DATASET_NAME="rnnandi/bn-turn-detection-dataset-train-v3-refined-50k"
 
 echo "Starting Turn Detector LoRA SFT Training"
 echo "Model: $MODEL_NAME"
@@ -27,23 +27,22 @@ NOHUP_LOG="${OUTPUT_DIR}/logs/train_$(date +%Y%m%d_%H%M%S).log"
 # Run training with LLaMA Factory
 llamafactory-cli train \
     examples/train_lora/turn_detector_lora_sft.yaml \
-    --output_dir="${OUTPUT_DIR}" \
-    --model_name_or_path="${MODEL_NAME}" \
-    --dataset="${DATASET_NAME}" \
-    --cache_dir="${HF_HOME}" \
-    --max_samples=1000 \
-    --per_device_train_batch_size=2 \
-    --gradient_accumulation_steps=8 \
-    --learning_rate=2e-5 \
-    --num_train_epochs=20 \
-    --cutoff_len=512 \
-    --preprocessing_num_workers=16 \
-    --bf16=true \
-    --ddp_find_unused_parameters=false \
-    --dataloader_pin_memory=true \
-    --logging_steps=10 \
-    --save_steps=500 \
-    --report_to=wandb \
+    output_dir="${OUTPUT_DIR}" \
+    model_name_or_path="${MODEL_NAME}" \
+    dataset="${DATASET_NAME}" \
+    cache_dir="${HF_HOME}" \
+    per_device_train_batch_size=2 \
+    gradient_accumulation_steps=2 \
+    learning_rate=2e-5 \
+    num_train_epochs=1 \
+    cutoff_len=256 \
+    preprocessing_num_workers=16 \
+    bf16=true \
+    ddp_find_unused_parameters=false \
+    dataloader_pin_memory=true \
+    logging_steps=10 \
+    save_steps=500 \
+    report_to=none \
     > "$NOHUP_LOG" 2>&1 &
 
 PID=$!
@@ -51,3 +50,5 @@ echo "Training started in background. PID=${PID}"
 echo "Logs: $NOHUP_LOG"
 echo "Tail logs with: tail -f \"$NOHUP_LOG\""
 echo "Monitor with: watch -n 1 'tail -n 20 \"$NOHUP_LOG\"'"
+
+

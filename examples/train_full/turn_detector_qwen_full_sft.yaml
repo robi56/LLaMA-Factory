@@ -7,22 +7,19 @@ add_special_tokens: "<|im_start|>,<|im_end|>,<|user|>,<|assistant|>"
 ### method
 stage: sft
 do_train: true
-finetuning_type: lora
-lora_rank: 8
-lora_target: all
+finetuning_type: full
 
 ### dataset
 dataset: rnnandi/bn-turn-detection-dataset-train-v3-refined-50k
 template: qwen
-cutoff_len: 512
+cutoff_len: 256
 # max_samples: 1000  # Remove limit to use full dataset
 overwrite_cache: true
-preprocessing_num_workers: 8
-dataloader_num_workers: 2
-preprocessing_batch_size: 1000
+preprocessing_num_workers: 16
+dataloader_num_workers: 4
 
 ### output
-output_dir: models/qwen2_5-1_5b-bn-turn-detector-refined50k
+output_dir: models/qwen2_5-1_5b-bn-turn-detector-full
 logging_steps: 10
 save_steps: 500
 plot_loss: true
@@ -31,10 +28,10 @@ save_only_model: false
 report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 
 ### train
-per_device_train_batch_size: 2
-gradient_accumulation_steps: 2
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
 learning_rate: 2.0e-5
-num_train_epochs: 20
+num_train_epochs: 3
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
 bf16: true
@@ -44,6 +41,7 @@ resume_from_checkpoint: null
 ### eval
 # eval_dataset: turn_detector_demo
 # val_size: 0.1
-# per_device_eval_batch_size: 2
+# per_device_eval_batch_size: 1
 # eval_strategy: steps
 # eval_steps: 500
+

@@ -228,6 +228,71 @@ class SharegptDatasetConverter(DatasetConverter):
 
 
 @dataclass
+class SharegptRelaxedDatasetConverter(DatasetConverter):
+    def __call__(self, example: dict[str, Any]) -> dict[str, Any]:
+        tag_mapping = {
+            self.dataset_attr.user_tag: Role.USER.value,
+            self.dataset_attr.assistant_tag: Role.ASSISTANT.value,
+        }
+
+        messages = example[self.dataset_attr.messages]
+        system = ""
+        if self.dataset_attr.system_tag and len(messages) != 0 and messages[0].get(self.dataset_attr.role_tag) == self.dataset_attr.system_tag:
+            system = messages[0].get(self.dataset_attr.content_tag, "")
+            messages = messages[1:]
+
+        # Map only user/assistant and drop others
+        raw = []
+        for msg in messages:
+            role = msg.get(self.dataset_attr.role_tag)
+            content = msg.get(self.dataset_attr.content_tag, "")
+            if role in (self.dataset_attr.user_tag, self.dataset_attr.assistant_tag):
+                raw.append({"role": tag_mapping[role], "content": content})
+
+        if not raw:
+            logger.warning_rank0("Skipping this abnormal example.")
+            return {"_prompt": [], "_response": [], "_system": system, "_tools": "", "_images": None, "_videos": None, "_audios": None}
+
+        # Ensure conversation starts with user (prepend empty user if needed)
+        if raw[0]["role"] != Role.USER.value:
+            raw = [{"role": Role.USER.value, "content": ""}] + raw
+
+        # Enforce alternation by collapsing consecutive same-role messages
+        aligned = []
+        for msg in raw:
+            if len(aligned) == 0:
+                aligned.append(msg)
+            else:
+                if aligned[-1]["role"] == msg["role"]:
+                    # merge contents with a newline
+                    aligned[-1]["content"] = (aligned[-1]["content"] + "\n" + msg["content"]).strip()
+                else:
+                    aligned.append(msg)
+
+        # Ensure even count; if ends with user, drop the trailing user turn
+        if len(aligned) % 2 != 0 and aligned[-1]["role"] == Role.USER.value:
+            aligned = aligned[:-1]
+
+        if len(aligned) < 2:
+            logger.warning_rank0("Skipping this abnormal example.")
+            return {"_prompt": [], "_response": [], "_system": system, "_tools": "", "_images": None, "_videos": None, "_audios": None}
+
+        prompt = aligned[:-1]
+        response = aligned[-1:]
+
+        output = {
+            "_prompt": prompt,
+            "_response": response,
+            "_system": system,
+            "_tools": example[self.dataset_attr.tools] if self.dataset_attr.tools else "",
+            "_images": self._find_medias(example[self.dataset_attr.images]) if self.dataset_attr.images else None,
+            "_videos": self._find_medias(example[self.dataset_attr.videos]) if self.dataset_attr.videos else None,
+            "_audios": self._find_medias(example[self.dataset_attr.audios]) if self.dataset_attr.audios else None,
+        }
+        return output
+
+
+@dataclass
 class OpenAIDatasetConverter(DatasetConverter):
     def __call__(self, example: dict[str, Any]) -> dict[str, Any]:
         tag_mapping = {
@@ -371,6 +436,7 @@ DATASET_CONVERTERS = {
     "alpaca": AlpacaDatasetConverter,
     "sharegpt": SharegptDatasetConverter,
     "openai": OpenAIDatasetConverter,
+    "sharegpt_relaxed": SharegptRelaxedDatasetConverter,
 }
 
 

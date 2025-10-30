@@ -806,6 +806,21 @@
       "content_tag": "content",
       "user_tag": "user",
       "assistant_tag": "assistant"
-    }
+    },
+    "strict": false
+  },
+  "rnnandi/bn-turn-detection-dataset-train-v3-refined-50k": {
+    "hf_hub_url": "rnnandi/bn-turn-detection-dataset-train-v3-refined-50k",
+    "formatting": "sharegpt_relaxed",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    },
+    "strict": false
   }
 }
