@@ -1,5 +1,5 @@
 ### model
-model_name_or_path: Qwen/Qwen2.5-1.5B
+model_name_or_path: google/gemma-3-270m
 trust_remote_code: true
 resize_vocab: true
 add_special_tokens: "<|im_start|>,<|im_end|>,<|user|>,<|assistant|>"
@@ -12,7 +12,8 @@ finetuning_type: full
 ### dataset
 dataset: rnnandi/bn-turn-detection-dataset-train-v3-refined-50k
 template: qwen_turn
-cutoff_len: 256
+default_system: ""
+cutoff_len: 512
 # max_samples: 1000  # Remove limit to use full dataset
 overwrite_cache: true
 preprocessing_num_workers: 16

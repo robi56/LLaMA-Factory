@@ -1911,6 +1911,20 @@ register_template(
 )
 
 
+# custom: chat template with <|im_start|><|role|>content<|im_end|>
+register_template(
+    name="qwen_turn",
+    format_user=StringFormatter(slots=[{"token": "<|im_start|>"}, {"token": "<|user|>"}, "{{content}}", {"token": "<|im_end|>"}]),
+    format_assistant=StringFormatter(slots=[{"token": "<|im_start|>"}, {"token": "<|assistant|>"}, "{{content}}", {"token": "<|im_end|>"}]),
+    # no system role at all
+    format_system=EmptyFormatter(),
+    stop_words=["<|im_end|>"],
+    replace_eos=True,
+    replace_jinja_template=True,
+)
+
+
+
 # copied from qwen template
 register_template(
     name="qwen2_vl",
